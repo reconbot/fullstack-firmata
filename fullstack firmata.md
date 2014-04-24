@@ -19,23 +19,80 @@
 
 ---
 
+# What are NodeBots?
+
+## NodeBots are robots that are controlled by node.js.
+
+
+---
+
+# What are NodeBots?
+
+## Robots are inherently asynchronous. NodeJS & JavaScript makes async easy.
+## Single threaded, turn based, non-blocking execution.
+
+---
+
+![fit](media/chris.png)
+
+---
+
+![fit](media/nodebot-team.png)
+
+---
+
+# What's firmata anyway?
+
+---
+
+> Firmata is a generic protocol for communicating with microcontrollers from software on a host computer.
+-- firmata.org (probably Jeff)
+
+---
+
+![fit](media/jeff-hoefs.png)
+
+---
+# Works in a lot of cool places
+- Arduino
+- Beagal Bone
+- Raspberry Pi
+- JS
+- Ruby
+- Python
+- Go
+
+---
+
 # [fit] ❤ Johnny-Five
 
 ![right original](media/johny-five.png)
 
 ---
 
-Overview of why JS robots
+> Johnny-Five is a library of device drivers for the physical world. It's also jQuery for robots.
+-- Francis
 
-# Make it really easy to make robots
+---
 
+#Johnny-Five is...
 
-___
+- Johnny-Five is an Open Source, JavaScript Arduino programming framework, developed at Bocoup
+- A library of modules for devices as small as buttons to as large as walking robots.
+- Lots and lots of modules
+
+![right fit](media/j5-sensors.gif)
+
+---
+
+![fit](media/rick.png)
+
+---
 
 > A blinking light is the hello world of robotics
 -- Sara Chipps
 
-___
+---
 
 
 ```js
@@ -51,7 +108,7 @@ var board = new five.Board();
 
 board.on("ready", function() {
 
-  var led = new five.Led(13);
+  var led = new five.Led(4);
   led.strobe();
 
 });
@@ -64,7 +121,7 @@ board.on("ready", function() {
 
 ```
 
-![right](media/led-strobe.mp4)
+![right](media/led-strobe.gif)
 
 
 ---
@@ -78,7 +135,50 @@ board.on("ready", function() {
 
 ---
 
-1. Johnny-Five looks for USB ports
+![original](media/j5-stack.png)
+
+---
+
+# Johnny-Five's Default Stack
+
+```js
+var five = require("johnny-five");
+var Firmata = require("firmata");
+
+var board = new five.Board({
+  // default and auto
+  io: new Firmata.Board()
+});
+
+```
+
+---
+
+![original](media/j5-stack-spy.png)
+
+---
+
+# Johnny-Five's Spying Stack
+
+```js
+var five = require("johnny-five");
+var FirmataSpy = require("firmata-spy");
+
+var board = new five.Board({
+  // lets spy!
+  io: new FirmataSpy({debug: true})
+});
+
+board.on("ready", function() {
+  var led = new five.Led(4);
+  led.strobe();
+});
+
+```
+
+---
+
+1. Johnny-Five looks for USB serial ports
 1. Opens the first obvious one & listen for Arduino
 1. Arduino starts up and says "Hello"
 1. J5 sets pin 4 to output
@@ -88,51 +188,104 @@ board.on("ready", function() {
 1. J5 sets pin 4 to low
 ... forever
 
-![right](media/firmata-spy-strobe2.png)
+![right](media/firmata-spy-strobe.gif)
 
 ---
 
-# Johnny-Five's Default Stack
-
-1. Node Firmata
-2. Node-Serialport
-3. Firmata/Arduino
+# Lets go deeper
 
 ---
 
-
+![original](media/j5-stack-serial.png)
 
 ---
 
-# Johnny-Five's Default Stack
+# Firmata
+
+### Composed of MIDI Messages
+
+---
+^ yes that midi
+
+![](media/midi.jpg)
+
+---
+
+# Firmata
+
+### Composed of MIDI Messages
+### Passes data in 7bit encoding
+
+---
+
+# Firmata
+
+### Composed of MIDI Messages
+### Passes data in 7bit encoding
+### Pain in the ass
+
+---
+![fit](media/midi-flowchart.png)
+
+---
+
+![150%](media/midi-flowchart.png)
+
+---
+
+# Spying Tools
 
 ```js
-var Firmata = require("firmata"),
-  five = require("johnny-five");
+// Knows how to parse and generate midi messages
+var MidiParser = require('midi-parser');
 
-var board = new five.Board({
-  // default
-  io: new Firmata.Board()
-});
+// Knows how to use midi-parser to parse and
+// generate firmata messages
+var FirmataParser = require('firmata-parser');
 
 ```
 
----
-# Johnny-Five's Spying Stack
 
-```js
-var Firmata = require("firmata"),
-  five = require("johnny-five");
-  //stolen from j5
-  MockFirmata = require("mock-firmata")
-var board = new five.Board({
-  // lets spy!
-  io: new MockFirmata({debug:true})
-});
 
-```
+
+
+
+
+
 
 ---
+# Want to learn more?
+---
 
-Johnny-Five => Node Firmata => USB SERIAL => Arduino
+# nodebots.io
+#[fit] github.com/rwaldron/johnny-five
+#[fit] github.com/firmata/arduino
+---
+
+# Find a meetup or start your own!
+
+- NodeBots Guatemala - Guatemala
+- NodeBots Medellín - Colombia
+- NodeBots Villavicencio - Colombia
+- NodeBots of London - UK
+- NodeBots NYC - USA
+- NodeBots SF - USA
+
+---
+
+# NodeBots Fortaleza?
+# NodeBots Rio de Janeiro?
+# NodeBots São Paulo?
+
+---
+
+# NodeBots Fortaleza?
+# NodeBots Rio de Janeiro?
+# NodeBots São Paulo?
+
+#[fit] github.com/nodebots/www/pulls
+
+---
+
+#[fit] THANK YOU
 
