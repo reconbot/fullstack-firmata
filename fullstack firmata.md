@@ -221,8 +221,9 @@ board.on("ready", function() {
 # Firmata
 
 ### Composed of MIDI Messages
+### Not very complex
 ### Passes data in 7bit encoding
-### Pain in the ass
+### Mostly MIDI complient
 
 ---
 ![fit](media/midi-flowchart.png)
@@ -243,18 +244,312 @@ var MidiParser = require('midi-parser');
 // generate firmata messages
 var FirmataParser = require('firmata-parser');
 
+// Pretends to be a serial port
+var SerialSpy = require('serial-spy');
+
+
 ```
 
+---
 
+# First Step: The Startup
+# Second Step: Call the functions and see what happen.
 
+---
 
-
-
-
+# The Startup
 
 
 ---
+
+# Startup
+
+```js
+
+var Board = require("firmata").Board;
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser();
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+```
+
+---
+
+# Startup
+
+```js
+
+var Board = require("firmata").Board;
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser();
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+```
+![right](media/startup.png)
+
+---
+
+# That didn't work
+# Raw midi data isn't that useful
+
+---
+
+# Startup take 2
+
+```js
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+```
+
+---
+# Startup take 2
+
+```js
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+```
+
+![fit right](media/serial-spy-parsed.png)
+
+---
+
+# Node Firmata is asking for:
+
+## Protocol Version
+
+## Firmware Information
+
+---
+
+# Startup Take 3
+
+```js
+
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+serialSpy.emit('data', FirmataParser.firmataVersion());
+serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+
+```
+
+---
+
+# Startup Take 3
+
+```js
+
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+serialSpy.emit('data', FirmataParser.firmataVersion());
+serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+
+```
+
+![right](media/capability-query.png)
+
+---
+
+# Digital Reporting
+When enabled on a pin firmata will report the digital value (0,1) of this pin when it changes.
+
+# Analog Reporting
+When enabled on a pin firmata will report the analog value (0-65535) every 200ms (configurable).
+
+---
+
+# Capability Query
+
+These queries are intended to allow GUI-based programs to discover the capabilities and current state of any board running Firmata. The idea is to facilitate displaying highly accurate on-screen representation of the board
+
+The capabilities response provides a list of all modes supported by all pins, and the resolution used by each mode.
+
+---
+
+# Startup Take 4
+
+```js
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+serialSpy.emit('data', FirmataParser.firmataVersion());
+serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+
+var pins = [{digital: true}];
+serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
+```
+
+---
+
+# Startup Take 4
+
+```js
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+serialSpy.emit('data', FirmataParser.firmataVersion());
+serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+
+var pins = [{digital: true}];
+serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
+```
+
+![right](media/analog-mapping.png)
+
+---
+
+#Analog Mapping Query
+
+The analog mapping query provides the information about which pins (as used with Firmata's pin mode message) correspond to the analog channels
+
+---
+
+# Startup take 5
+
+```js
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+serialSpy.emit('data', FirmataParser.firmataVersion());
+serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+
+var pins = [{digital: true, analog: true}];
+serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
+serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
+
+```
+
+
+---
+
+# Startup take 5
+
+```js
+var Board = require("firmata").Board;
+var FirmataParser = require('firmata-parser');
+var SerialSpy = require('serial-spy');
+
+var serialSpy = new SerialSpy({debug:true});
+var parser = new FirmataParser({debug:true});
+
+serialSpy.on('write', function(data){
+  parser.write(data);
+});
+
+var board = new Board(serialSpy, function(){
+  console.log("ready to robot!");
+});
+
+serialSpy.emit('data', FirmataParser.firmataVersion());
+serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+
+var pins = [{digital: true, analog: true}];
+serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
+serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
+
+```
+
+![right](media/ready-to-robot.png)
+
+---
+
 # Want to learn more?
+
 ---
 
 # nodebots.io
