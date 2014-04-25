@@ -16,6 +16,21 @@ var board = new Board(serialSpy, function(){
 serialSpy.emit('data', FirmataParser.firmataVersion());
 serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
 
-var pins = [{digital: true, analog: true}];
+var pins = [
+  {digital: true}, // pin 0
+  {digital: true}, // pin 1
+  {digital: true}, // pin 2
+  {digital: true}, // pin 3
+  {digital: true}, // pin 4
+  {digital: true}, // pin 5
+  {digital: true}, // pin 6
+  {digital: true}  // pin 7
+];
 serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
 serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
+
+board.pinMode(4,1);
+board.digitalWrite(4, 1);
+board.digitalWrite(4, 0);
+board.digitalWrite(4, 1);
+board.digitalWrite(4, 0);
