@@ -253,7 +253,7 @@ var SerialSpy = require('serial-spy');
 ---
 
 # First Step: The Startup
-# Second Step: Call the functions and see what happen.
+# Second Step: Call the functions and see what happens.
 
 ---
 
@@ -297,10 +297,12 @@ var board = new Board(serialSpy, function(){
 
 ---
 
-# That didn't work
+# Not ready to robot =(
 # Raw midi data isn't that useful
 
 ---
+
+^ Firmata Parser to the rescue
 
 # Startup take 2
 
@@ -407,13 +409,15 @@ serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
 
 ![right](media/capability-query.png)
 
+^ We got 3 things going on here. Firmata sent a bunch of reporting commands both analog and digital, and we have a capability query.
+
 ---
 
 # Digital Reporting
 When enabled on a pin firmata will report the digital value (0,1) of this pin when it changes.
 
 # Analog Reporting
-When enabled on a pin firmata will report the analog value (0-65535) every 200ms (configurable).
+When enabled on a pin firmata will report the analog value (0-65535) every 100ms (configurable).
 
 ---
 
@@ -450,6 +454,7 @@ var pins = [{digital: true}];
 serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
 ```
 
+^ Lets pretend we have a digital pin
 ---
 
 # Startup Take 4
@@ -483,7 +488,11 @@ serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
 
 #Analog Mapping Query
 
-The analog mapping query provides the information about which pins (as used with Firmata's pin mode message) correspond to the analog channels
+The analog mapping query provides the information about which pins (as used with Firmata's pin mode message) correspond to the analog channels.
+
+For example;
+`A1 => 4`
+`A2 => 5`
 
 ---
 
@@ -514,6 +523,7 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
 
 ```
 
+^ Now lets pretend we have an a1 pin that is also pin 1
 
 ---
 
@@ -536,7 +546,7 @@ var board = new Board(serialSpy, function(){
 });
 
 serialSpy.emit('data', FirmataParser.firmataVersion());
-serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
+serialSpy.emit('data', FirmataParser.firmwareVersion("spyware"));
 
 var pins = [{digital: true, analog: true}];
 serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
@@ -545,6 +555,39 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
 ```
 
 ![right](media/ready-to-robot.png)
+
+---
+# Full Startup Sequence
+ - Ask for version and firmware
+ - Give version # and firmware
+ - Ask for Pin Capabilities
+ - Give pin Capabilites
+ - Ask for Analog Mapping
+ - Give mapping
+
+---
+
+
+#[fit] READY TO ROBOT
+
+---
+# Call the functions and see what happens
+---
+
+```js
+// Same as before but
+// respond with 8 fake pins
+// READY TO ROBOT...
+
+board.pinMode(4,1);
+board.digitalWrite(4, 1);
+board.digitalWrite(4, 0);
+board.digitalWrite(4, 1);
+board.digitalWrite(4, 0);
+
+```
+
+![right](media/strobe-funcs.png)
 
 ---
 
