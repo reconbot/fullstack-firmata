@@ -9,7 +9,7 @@ var board = new five.Board({
 });
 
 var led = new five.Led(4);
-led.strobe();
+led.blink();
 
 // board.repl.inject({
 //   led: led

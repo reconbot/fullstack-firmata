@@ -137,7 +137,7 @@ var board = new five.Board();
 board.on("ready", function() {
 
   var led = new five.Led(4);
-  led.strobe();
+  led.blink();
 
 });
 
@@ -174,10 +174,13 @@ board.on("ready", function() {
 ```js
 var five = require("johnny-five");
 var Firmata = require("firmata");
+var SerialPort = require('serial-port').SerialPort;
 
 var board = new five.Board({
   // default and auto
-  io: new Firmata.Board()
+  io: new Firmata.Board({
+    port: new SerialPort()
+  })
 });
 
 ```
@@ -201,7 +204,7 @@ var board = new five.Board({
 
 board.on("ready", function() {
   var led = new five.Led(4);
-  led.strobe();
+  led.blink();
 });
 
 ```
@@ -288,7 +291,7 @@ var SerialSpy = require('serial-spy');
 
 # The Handshake
 
-Happens when a firmata server talks to a firmata device. Determines what the device can do and if they are compatible.
+Happens when a firmata server talks to a firmata device. Determines what the device can do and if they are compatible. Only one version `v2.3`.
 
 ^ But lets go deeper
 
@@ -302,7 +305,6 @@ var Board = require("firmata").Board;
 var SerialSpy = require('serial-spy');
 
 var serialSpy = new SerialSpy({debug:true});
-var parser = new FirmataParser();
 var board = new Board(serialSpy, function(){
   console.log("ready to robot!");
 });
@@ -321,7 +323,6 @@ var Board = require("firmata").Board;
 var SerialSpy = require('serial-spy');
 
 var serialSpy = new SerialSpy({debug:true});
-var parser = new FirmataParser();
 var board = new Board(serialSpy, function(){
   console.log("ready to robot!");
 });
@@ -331,8 +332,10 @@ var board = new Board(serialSpy, function(){
 
 ---
 
-# Not ready to robot =(
+# Not "ready to robot"
 # Raw midi data isn't that useful
+
+![right](media/noduck.gif)
 
 ---
 
@@ -601,9 +604,9 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
  - Ask for version and firmware
  - Give version # and firmware
  - Ask for Pin Capabilities
- - Give pin Capabilites
+ - Give Pin Capabilites
  - Ask for Analog Mapping
- - Give mapping
+ - Give Analog Mapping
 
 ---
 
@@ -616,7 +619,7 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
 ```js
 // Same as before but
 // respond with 8 fake pins
-// READY TO ROBOT...
+...
 
 board.pinMode(4,1);
 board.digitalWrite(4, 1);
@@ -647,7 +650,7 @@ var j5Board = new five.Board({
 });
 
 var led = new five.Led(4);
-led.strobe();
+led.blink();
 
 ```
 
@@ -734,10 +737,10 @@ void digitalWriteCallback(byte port, int value)
 
 ---
 # From the bottom up
- 1. Arduino: `writePort()` => `digitalWrite()`
+ 1. Arduino: `digitalWrite()`
  1. Firmata (protocol): `digitalMessage`
  1. Node-Firmata: `digitalWrite()`
- 1. Johnny-Five: `led.strobe()`
+ 1. Johnny-Five: `led.blink()`
 
 ---
 
