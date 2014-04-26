@@ -41,7 +41,9 @@
 
 ---
 
-JSCONF 2013 VIDEO
+![](media/jsconf-us-2013-examples.mp4)
+
+^ JSCONF 2013
 
 ---
 
