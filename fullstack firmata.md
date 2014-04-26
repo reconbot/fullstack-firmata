@@ -41,6 +41,10 @@
 
 ---
 
+JSCONF 2013 VIDEO
+
+---
+
 # What's firmata anyway?
 
 ---
@@ -48,9 +52,13 @@
 > Firmata is a generic protocol for communicating with microcontrollers from software on a host computer.
 -- firmata.org (probably Jeff)
 
+^ sometimes usb, bluetooth, xbee, wifi
+
 ---
 
 ![fit](media/jeff-hoefs.png)
+
+^ Jeff took the firmata arduino project over a few years ago and made it a lot better. He needs C programmers with a will to help!
 
 ---
 # Works in a lot of cool places
@@ -131,11 +139,13 @@ board.on("ready", function() {
 
 ---
 
-# What's happening here?
+# Let's go deeper
 
 ---
 
 ![original](media/j5-stack.png)
+
+^ J5 by default expects firmata, but now can work with plugable backends for the begal bone, sparkcore and raspberry-pi
 
 ---
 
@@ -192,7 +202,7 @@ board.on("ready", function() {
 
 ---
 
-# Lets go deeper
+# Let's go deeper
 
 ---
 
@@ -221,7 +231,6 @@ board.on("ready", function() {
 # Firmata
 
 ### Composed of MIDI Messages
-### Not very complex
 ### Passes data in 7bit encoding
 ### Mostly MIDI complient
 
@@ -252,17 +261,20 @@ var SerialSpy = require('serial-spy');
 
 ---
 
-# First Step: The Startup
+# First Step: The Handshake
 # Second Step: Call the functions and see what happens.
 
 ---
 
-# The Startup
+# The Handshake
 
+Happens when a firmata server talks to a firmata device. Determines what the device can do and if they are compatible.
+
+^ But lets go deeper
 
 ---
 
-# Startup
+# Handshake
 
 ```js
 
@@ -277,9 +289,11 @@ var board = new Board(serialSpy, function(){
 
 ```
 
+^ if all goes well we'll be ready to robot
+
 ---
 
-# Startup
+# Handshake
 
 ```js
 
@@ -304,7 +318,7 @@ var board = new Board(serialSpy, function(){
 
 ^ Firmata Parser to the rescue
 
-# Startup take 2
+# Handshake take 2
 
 ```js
 var Board = require("firmata").Board;
@@ -325,7 +339,7 @@ var board = new Board(serialSpy, function(){
 ```
 
 ---
-# Startup take 2
+# Handshake take 2
 
 ```js
 var Board = require("firmata").Board;
@@ -357,7 +371,7 @@ var board = new Board(serialSpy, function(){
 
 ---
 
-# Startup Take 3
+# Handshake Take 3
 
 ```js
 
@@ -383,7 +397,7 @@ serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
 
 ---
 
-# Startup Take 3
+# Handshake Take 3
 
 ```js
 
@@ -417,7 +431,7 @@ serialSpy.emit('data', FirmataParser.firmwareVersion("spy"));
 When enabled on a pin firmata will report the digital value (0,1) of this pin when it changes.
 
 # Analog Reporting
-When enabled on a pin firmata will report the analog value (0-65535) every 100ms (configurable).
+When enabled on a pin firmata will report the analog value (0-65535) if it changes between  19ms polls (this is up to the client).
 
 ---
 
@@ -429,7 +443,7 @@ The capabilities response provides a list of all modes supported by all pins, an
 
 ---
 
-# Startup Take 4
+# Handshake Take 4
 
 ```js
 var Board = require("firmata").Board;
@@ -455,9 +469,10 @@ serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
 ```
 
 ^ Lets pretend we have a digital pin
+
 ---
 
-# Startup Take 4
+# Handshake Take 4
 
 ```js
 var Board = require("firmata").Board;
@@ -491,12 +506,12 @@ serialSpy.emit('data', FirmataParser.capabilityResponse(pins));
 The analog mapping query provides the information about which pins (as used with Firmata's pin mode message) correspond to the analog channels.
 
 For example;
-`A1 => 4`
-`A2 => 5`
+`A5 => 14`
+`A4 => 15`
 
 ---
 
-# Startup take 5
+# Handshake take 5
 
 ```js
 var Board = require("firmata").Board;
@@ -523,11 +538,11 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
 
 ```
 
-^ Now lets pretend we have an a1 pin that is also pin 1
+^ Now lets pretend we have an a1 pin that is also pin 1 and send our analogMappingResponse
 
 ---
 
-# Startup take 5
+# Handshake take 5
 
 ```js
 var Board = require("firmata").Board;
@@ -557,7 +572,12 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
 ![right](media/ready-to-robot.png)
 
 ---
-# Full Startup Sequence
+
+#[fit] READY TO ROBOT!
+
+---
+
+# Full Handshake Sequence
  - Ask for version and firmware
  - Give version # and firmware
  - Ask for Pin Capabilities
@@ -567,11 +587,10 @@ serialSpy.emit('data', FirmataParser.analogMappingResponse(pins));
 
 ---
 
-
-#[fit] READY TO ROBOT
-
----
 # Call the functions and see what happens
+
+^ back to blink
+
 ---
 
 ```js
@@ -589,15 +608,173 @@ board.digitalWrite(4, 0);
 
 ![right](media/strobe-funcs.png)
 
+^ Look at those bytes that j5 caused to send!
+
+---
+
+# When you string everything together...
+
+---
+# J5 with Serial Spy
+
+```js
+// firmata board from previous
+var j5Board = new five.Board({
+  // lets spy!
+  io: board,
+  debug: true,
+  repl: false
+});
+
+var led = new five.Led(4);
+led.strobe();
+
+```
+
+
+![right](media/j5-serial-spy.gif)
+
+---
+
+# Let's go deeper!
+
+---
+
+![fit](media/j5-stack-arduino.png)
+
+^ We know it's getting the serial data from firmata but we don't know what it's doing
+
+---
+
+# Firmata-Arduino
+
+---
+
+# standardFirmata.ino
+
+---
+# standardFirmata.ino
+- Loaded on many arduinos by default.
+- Knows how to handshake and provides all default functionality
+- Has lots of friends for when you have special needs servoFirmata, configurableFirmata, AnalogFirmata
+
+---
+
+# standardFirmata.ino
+
+```c
+void setup()
+{
+  Firmata.setFirmwareVersion(FIRMATA_MAJOR_VERSION, FIRMATA_MINOR_VERSION);
+
+  Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
+  Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
+  Firmata.attach(REPORT_ANALOG, reportAnalogCallback);
+  Firmata.attach(REPORT_DIGITAL, reportDigitalCallback);
+  Firmata.attach(SET_PIN_MODE, setPinModeCallback);
+  Firmata.attach(START_SYSEX, sysexCallback);
+  Firmata.attach(SYSTEM_RESET, systemResetCallback);
+
+  Firmata.begin(57600);
+  systemResetCallback();  // reset to default config
+}
+```
+
+^ this is the magic, I don't know c worth a dam but this is easy to read
+
+---
+
+# standardFirmata.ino Digital Write
+
+```c
+void digitalWriteCallback(byte port, int value)
+{
+  byte pin, lastPin, mask=1, pinWriteMask=0;
+
+  if (port < TOTAL_PORTS) {
+    // create a mask of the pins on this port that are writable.
+    lastPin = port*8+8;
+    if (lastPin > TOTAL_PINS) lastPin = TOTAL_PINS;
+    for (pin=port*8; pin < lastPin; pin++) {
+      // do not disturb non-digital pins (eg, Rx & Tx)
+      if (IS_PIN_DIGITAL(pin)) {
+        // only write to OUTPUT and INPUT (enables pullup)
+        // do not touch pins in PWM, ANALOG, SERVO or other modes
+        if (pinConfig[pin] == OUTPUT || pinConfig[pin] == INPUT) {
+          pinWriteMask |= mask;
+          pinState[pin] = ((byte)value & mask) ? 1 : 0;
+        }
+      }
+      mask = mask << 1;
+    }
+    writePort(port, (byte)value, pinWriteMask);
+  }
+}
+```
+
+---
+# From the bottom up
+ 1. Arduino: `writePort()` => `digitalWrite()`
+ 1. Firmata (protocol): `digitalMessage`
+ 1. Node-Firmata: `digitalWrite()`
+ 1. Johnny-Five: `led.strobe()`
+
+---
+
+#[fit]Lets go bigger!
+
+---
+
+![fit](media/ed209.jpg)
+
+---
+
+```js
+var ED = require('johhny-five/eg/ed.js');
+var ed209 = new ED({
+  // assign servos
+  right: {
+    hip: 9,
+    foot: 11
+  },
+  left: {
+    hip: 10,
+    foot: 12
+  }
+});
+
+// Stand upright!
+ed209.attn();
+
+// Walk forward!
+ed209.fwd();
+
+// Code and video from Johnny-Five
+// and Rick Waldren
+
+```
+
+![right](media/ed-walking.gif)
+
+---
+
+![left](media/ed209-firmata-spy.gif)
+![right](media/ed-walking.gif)
+
+---
+
+> You can start coding your robot today
+
 ---
 
 # Want to learn more?
 
----
+ - nodebots.io
+ - github.com/rwaldron/johnny-five
+ - github.com/firmata/arduino
+ - github.com/reconbot/firmata-parser
+ - github.com/reconbot/firmata-spy
 
-# nodebots.io
-#[fit] github.com/rwaldron/johnny-five
-#[fit] github.com/firmata/arduino
 ---
 
 # Find a meetup or start your own!
@@ -625,5 +802,12 @@ board.digitalWrite(4, 0);
 
 ---
 
-#[fit] THANK YOU
+#[fit] THANK YOU!
+# Francis Gulotta
+# @reconbot
+# wizarddevelopment.com
+
+---
+
+#[fit] github.com/reconbot/fullstack-firmata
 
