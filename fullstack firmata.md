@@ -47,6 +47,24 @@
 
 ---
 
+# Robots Conf
+
+![](media/robots-conf-boebot.jpg)
+
+---
+
+![](media/robots-conf-boebot.jpg)
+
+---
+
+![fit](media/robots-conf-rick-drone.png)
+
+---
+
+![](media/robots-conf-doug.jpg)
+
+---
+
 # What's firmata anyway?
 
 ---
