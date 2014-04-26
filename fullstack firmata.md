@@ -83,7 +83,7 @@
 ---
 # Works in a lot of cool places
 - Arduino
-- Beagal Bone
+- Beaglebone
 - Raspberry Pi
 - JS
 - Ruby
@@ -144,7 +144,7 @@ board.on("ready", function() {
 
 
 
-//Video Stolen from Rick Waldren
+//Video Stolen from Rick Waldron
 //github.com/rwaldron/johnny-five
 
 ```
@@ -773,7 +773,7 @@ ed209.attn();
 ed209.fwd();
 
 // Code and video from Johnny-Five
-// and Rick Waldren
+// and Rick Waldron
 
 ```
 
