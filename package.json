@@ -9,9 +9,9 @@
   "author": "",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "johnny-five": "~0.7.31",
-    "firmata": "~0.3.3",
-    "firmata-parser": "0.0.1",
+    "johnny-five": "~0.10.3",
+    "firmata": "~0.14.1",
+    "firmata-parser": "0.0.4",
     "midi-parser": "~0.1.0",
     "compulsive": "~0.3.1"
   }
